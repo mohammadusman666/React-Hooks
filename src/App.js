@@ -44,7 +44,9 @@ const App = () => {
     <div>
       <h1>Hello React</h1>
 
-      <Search id='search' label='Search' value={ searchTerm } onValueChange={ onSearchChange }/>
+      <InputWithLabel id='search' value={ searchTerm } onValueChange={ onSearchChange }>
+        <SimpleText text='Search: ' />
+      </InputWithLabel>
 
       <hr />
 
@@ -53,10 +55,16 @@ const App = () => {
   );
 }
 
-const Search = ({ id, label, type = 'text', value, onValueChange }) => {
+const SimpleText = ({ text }) => {
+  return (
+  <strong>{ text }</strong>
+  )
+}
+
+const InputWithLabel = ({ id, type = 'text', value, onValueChange, children }) => {
   return (
     <>
-      <label htmlFor={ id }>{ label }: </label>
+      <label htmlFor={ id }>{ children }</label>
       <input id={ id } type={ type } value={ value } onChange={ onValueChange } />
     </>
   );
