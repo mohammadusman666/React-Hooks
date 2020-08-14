@@ -43,22 +43,24 @@ const App = () => {
   );
 }
 
-const Search = (props) => {
+const Search = ({ searchTerm, onSearchChange }) => {
   return (
     <div>
       <label htmlFor="search">Search: </label>
-      <input id="search" type="text" value={ props.searchTerm } onChange={ props.onSearchChange } />
-
-      <p>
-        Searching for <strong>{ props.searchTerm }</strong>
-      </p>
+      <input id="search" type="text" value={ searchTerm } onChange={ onSearchChange } />
     </div>
   );
 }
 
-const List = (props) => (
-  props.list.map(item => (
-    <div key={ item.objectID }>
+const List = ({ list }) => (
+  list.map(item => (
+    <Item key={ item.objectID } item={ item } />
+  ))
+)
+
+const Item = ({ item }) => {
+  return (
+    <div>
       <span>
         <a href={ item.url }>{ item.title }</a>
       </span>
@@ -66,7 +68,7 @@ const List = (props) => (
       <span>{ item.author }</span>
       <span>{ item.points }</span>
     </div>
-  ))
-)
+  )
+}
 
 export default App;
