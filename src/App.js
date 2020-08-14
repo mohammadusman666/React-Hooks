@@ -39,9 +39,24 @@ const initialStories = [
   },
 ];
 
-const App = () => {
-  const [stories, setStories] = useState(initialStories);
+const getAsyncStories = () => {
+  return new Promise(resolve =>
+    setTimeout(
+      () => resolve({ data: { stories: initialStories } }),
+      2000
+    )
+  )
+}
 
+const App = () => {
+  const [stories, setStories] = useState([]);
+
+  useEffect(() => {
+    getAsyncStories().then((result) => {
+      setStories(result.data.stories);
+    });
+  }, []);
+  
   const onDeleteStory = (item) => {
     const newStories = stories.filter((story) => 
       story.objectID !== item.objectID
