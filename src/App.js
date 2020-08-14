@@ -20,15 +20,15 @@ const App = () => {
     },
   ];
 
-  const [searchTerm, setSearchTerm] = React.useState('');
+  const [searchTerm, setSearchTerm] = React.useState('React');
 
   const onSearchChange = (event) => {
     setSearchTerm(event.target.value);
   }
 
-  const searchedStories = stories.filter(function(story) {
-    return story.title.toLowerCase().includes(searchTerm.toLowerCase());
-  });
+  const searchedStories = stories.filter((story) =>
+    story.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div>
@@ -47,7 +47,7 @@ const Search = (props) => {
   return (
     <div>
       <label htmlFor="search">Search: </label>
-      <input id="search" type="text" onChange={ props.onSearchChange } />
+      <input id="search" type="text" value={ props.searchTerm } onChange={ props.onSearchChange } />
 
       <p>
         Searching for <strong>{ props.searchTerm }</strong>
