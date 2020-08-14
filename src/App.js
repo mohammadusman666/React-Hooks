@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-```
+/*
 Custom hook with effect
 
 Parameters:
@@ -9,7 +9,7 @@ Parameters:
 
 Returns:
   state variable and its updater
-```
+*/
 const useSemiPersistentState = (key, initialValue) => {
   const [value, setValue] = useState(localStorage.getItem(key) || initialValue);
 
@@ -20,25 +20,35 @@ const useSemiPersistentState = (key, initialValue) => {
   return [value, setValue];
 }
 
+const initialStories = [
+  {
+    title: 'React',
+    url: 'https://reactjs.org/',
+    author: 'Jordan Walke',
+    num_comments: 3,
+    points: 4,
+    objectID: 0,
+  },
+  {
+    title: 'Redux',
+    url: 'https://redux.js.org/',
+    author: 'Dan Abramov, Andrew Clark',
+    num_comments: 2,
+    points: 5,
+    objectID: 1,
+  },
+];
+
 const App = () => {
-  const stories = [
-    {
-      title: 'React',
-      url: 'https://reactjs.org/',
-      author: 'Jordan Walke',
-      num_comments: 3,
-      points: 4,
-      objectID: 0,
-    },
-    {
-      title: 'Redux',
-      url: 'https://redux.js.org/',
-      author: 'Dan Abramov, Andrew Clark',
-      num_comments: 2,
-      points: 5,
-      objectID: 1,
-    },
-  ];
+  const [stories, setStories] = useState(initialStories);
+
+  const onDeleteStory = (item) => {
+    const newStories = stories.filter((story) => 
+      story.objectID !== item.objectID
+    );
+
+    setStories(newStories);
+  }
 
   const [searchTerm, setSearchTerm] = useSemiPersistentState('searchTerm', 'React');
 
@@ -60,7 +70,7 @@ const App = () => {
 
       <hr />
 
-      <List list={ searchedStories }/>
+      <List list={ searchedStories } onRemoveItem={ onDeleteStory }/>
     </div>
   );
 }
@@ -94,13 +104,17 @@ const InputWithLabel = ({ id, type = 'text', value, isFocused, onValueChange, ch
   );
 }
 
-const List = ({ list }) => (
+const List = ({ list, onRemoveItem }) => (
   list.map(item => (
-    <Item key={ item.objectID } item={ item } />
+    <Item key={ item.objectID } item={ item } onRemoveItem={ onRemoveItem } />
   ))
 )
 
-const Item = ({ item }) => {
+const Item = ({ item, onRemoveItem }) => {
+  // const handleRemoveItem = () => {
+  //   onRemoveItem(item);
+  // }
+
   return (
     <div>
       <span>
@@ -109,6 +123,11 @@ const Item = ({ item }) => {
       <span>{ item.num_comments }</span>
       <span>{ item.author }</span>
       <span>{ item.points }</span>
+      <span>
+        <button type="button" onClick={() => onRemoveItem(item)}>
+          Dismiss
+        </button>
+      </span>
     </div>
   )
 }
