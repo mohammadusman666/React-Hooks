@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useReducer } from 'react';
 
 /*
 Custom hook with effect
@@ -48,8 +48,21 @@ const getAsyncStories = () => {
   )
 }
 
+const storiesReducer = (state, action) => {
+  switch (action.type) {
+    case 'SET_STORIES':
+      return action.payload;
+    case 'DELETE_STORY':
+      return state.filter(
+        story => action.payload.objectID !== story.objectID
+      )
+    default:
+      throw new Error();
+  }
+};
+
 const App = () => {
-  const [stories, setStories] = useState([]);
+  const [stories, dispatchStories] = useReducer(storiesReducer, []);
 
   const [searchTerm, setSearchTerm] = useSemiPersistentState('searchTerm', 'React');
 
@@ -61,7 +74,10 @@ const App = () => {
     setIsLoading(true);
 
     getAsyncStories().then((result) => {
-      setStories(result.data.stories);
+      dispatchStories({
+        type: 'SET_STORIES',
+        payload: result.data.stories
+      });
 
       setIsLoading(false);
     })
@@ -69,11 +85,10 @@ const App = () => {
   }, []);
   
   const onDeleteStory = (item) => {
-    const newStories = stories.filter((story) => 
-      story.objectID !== item.objectID
-    );
-
-    setStories(newStories);
+    dispatchStories({
+      type: 'DELETE_STORY',
+      payload: item,
+    });
   }
 
   const onSearchChange = (event) => {
