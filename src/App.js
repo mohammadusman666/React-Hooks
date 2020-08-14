@@ -55,10 +55,10 @@ const App = () => {
 
 const Search = ({ searchTerm, onSearchChange }) => {
   return (
-    <div>
+    <>
       <label htmlFor="search">Search: </label>
       <input id="search" type="text" value={ searchTerm } onChange={ onSearchChange } />
-    </div>
+    </>
   );
 }
 
