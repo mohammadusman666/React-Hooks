@@ -1,5 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
+```
+Custom hook with effect
+
+Parameters:
+  key: used to identify the value in localStorage
+  initialValue: the initial value
+
+Returns:
+  state variable and its updater
+```
 const useSemiPersistentState = (key, initialValue) => {
   const [value, setValue] = useState(localStorage.getItem(key) || initialValue);
 
@@ -7,7 +17,7 @@ const useSemiPersistentState = (key, initialValue) => {
     localStorage.setItem(key, value);
   }, [value, key])
 
-  return [value, setValue];  
+  return [value, setValue];
 }
 
 const App = () => {
@@ -44,7 +54,7 @@ const App = () => {
     <div>
       <h1>Hello React</h1>
 
-      <InputWithLabel id='search' value={ searchTerm } onValueChange={ onSearchChange }>
+      <InputWithLabel id='search' value={ searchTerm } isFocused onValueChange={ onSearchChange }>
         <SimpleText text='Search: ' />
       </InputWithLabel>
 
@@ -61,11 +71,25 @@ const SimpleText = ({ text }) => {
   )
 }
 
-const InputWithLabel = ({ id, type = 'text', value, onValueChange, children }) => {
+const InputWithLabel = ({ id, type = 'text', value, isFocused, onValueChange, children }) => {
+  /* (A) First, create a ref with React’s useRef hook. This ref object is a persistent value which stays intact over the lifetime of a React component.
+  It comes with a property called current, which, in contrast to the ref object, can be changed. */
+  const inputRef = useRef();
+
+  /* (C) Third, opt into React’s lifecycle with React’s useEffect Hook, performing the focus on the input field when the component renders
+  (or its dependencies change). */
+  useEffect(() => {
+    if (isFocused && inputRef.current)
+      /* (D) And fourth, since the ref is passed to the input field’s ref attribute, its current property gives access to the element. Execute its focus
+      programmatically as a side-effect, but only if isFocused is set and the current property is existent. */
+      inputRef.current.focus();
+  }, [isFocused])
+
   return (
     <>
       <label htmlFor={ id }>{ children }</label>
-      <input id={ id } type={ type } value={ value } onChange={ onValueChange } />
+      {/* (B) Second, the ref is passed to the input field’s JSX-reserved ref attribute and the element instance is assigned to the changeable current property. */}
+      <input ref={ inputRef } id={ id } type={ type } value={ value } onChange={ onValueChange } />
     </>
   );
 }
