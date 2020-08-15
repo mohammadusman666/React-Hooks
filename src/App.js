@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useReducer } from 'react';
 
+const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
+
 /*
 Custom hook with effect
 
@@ -18,34 +20,6 @@ const useSemiPersistentState = (key, initialValue) => {
   }, [value, key])
 
   return [value, setValue];
-}
-
-const initialStories = [
-  {
-    title: 'React',
-    url: 'https://reactjs.org/',
-    author: 'Jordan Walke',
-    num_comments: 3,
-    points: 4,
-    objectID: 0,
-  },
-  {
-    title: 'Redux',
-    url: 'https://redux.js.org/',
-    author: 'Dan Abramov, Andrew Clark',
-    num_comments: 2,
-    points: 5,
-    objectID: 1,
-  },
-];
-
-const getAsyncStories = () => {
-  return new Promise(resolve =>
-    setTimeout(
-      () => resolve({ data: { stories: initialStories } }),
-      2000
-    )
-  )
 }
 
 const storiesReducer = (state, action) => {
@@ -92,15 +66,17 @@ const App = () => {
   useEffect(() => {
     dispatchStories({ type: 'STORIES_FETCH_INIT' });
 
-    getAsyncStories().then((result) => {
-      dispatchStories({
-        type: 'STORIES_FETCH_SUCCESS',
-        payload: result.data.stories
-      });
-    })
-    .catch(() => 
-      dispatchStories({ type: 'STORIES_FETCH_FAILURE' })
-    );
+    fetch(`${API_ENDPOINT}react`) // fetch popular tech stories for a certain query
+      .then(response => response.json()) // For the fetch API, the response needs to be translated into JSON
+      .then((result) => {
+        dispatchStories({
+          type: 'STORIES_FETCH_SUCCESS',
+          payload: result.hits
+        });
+      })
+      .catch(() => 
+        dispatchStories({ type: 'STORIES_FETCH_FAILURE' })
+      );
   }, []);
   
   const onDeleteStory = (item) => {
