@@ -63,13 +63,13 @@ const App = () => {
 
   const [searchTerm, setSearchTerm] = useSemiPersistentState('searchTerm', 'React');
 
+  const [url, setUrl] = useState(`${API_ENDPOINT}${searchTerm}`);
+
   const handleFetchStories = useCallback(
     () => {
-      if (!searchTerm) return;
-
       dispatchStories({ type: 'STORIES_FETCH_INIT' });
 
-      fetch(`${API_ENDPOINT}${searchTerm}`) // fetch popular tech stories for a certain query
+      fetch(url) // fetch popular tech stories for a certain query
         .then(response => response.json()) // For the fetch API, the response needs to be translated into JSON
         .then((result) => {
           dispatchStories({
@@ -81,7 +81,7 @@ const App = () => {
           dispatchStories({ type: 'STORIES_FETCH_FAILURE' })
         );
     },
-    [searchTerm],
+    [url],
   )
   
   useEffect(() => {
@@ -99,9 +99,9 @@ const App = () => {
     setSearchTerm(event.target.value);
   }
 
-  // const searchedStories = stories.data.filter((story) =>
-  //   story.title.toLowerCase().includes(searchTerm.toLowerCase())
-  // );
+  const handleSearchSubmit = () => {
+    setUrl(`${API_ENDPOINT}${searchTerm}`);
+  }
 
   return (
     <div>
@@ -110,6 +110,14 @@ const App = () => {
       <InputWithLabel id='search' value={ searchTerm } isFocused onValueChange={ onSearchChange }>
         <SimpleText text='Search: ' />
       </InputWithLabel>
+
+      <button
+        type="button"
+        disabled={!searchTerm}
+        onClick={handleSearchSubmit}
+      >
+        Submit
+      </button>
 
       <hr />
       { stories.isError && <p>Error in loading data!</p> }
