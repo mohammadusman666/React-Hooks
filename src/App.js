@@ -64,9 +64,11 @@ const App = () => {
   const [searchTerm, setSearchTerm] = useSemiPersistentState('searchTerm', 'React');
 
   useEffect(() => {
+    if (!searchTerm) return;
+
     dispatchStories({ type: 'STORIES_FETCH_INIT' });
 
-    fetch(`${API_ENDPOINT}react`) // fetch popular tech stories for a certain query
+    fetch(`${API_ENDPOINT}${searchTerm}`) // fetch popular tech stories for a certain query
       .then(response => response.json()) // For the fetch API, the response needs to be translated into JSON
       .then((result) => {
         dispatchStories({
@@ -77,7 +79,7 @@ const App = () => {
       .catch(() => 
         dispatchStories({ type: 'STORIES_FETCH_FAILURE' })
       );
-  }, []);
+  }, [searchTerm]);
   
   const onDeleteStory = (item) => {
     dispatchStories({
@@ -90,9 +92,9 @@ const App = () => {
     setSearchTerm(event.target.value);
   }
 
-  const searchedStories = stories.data.filter((story) =>
-    story.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // const searchedStories = stories.data.filter((story) =>
+  //   story.title.toLowerCase().includes(searchTerm.toLowerCase())
+  // );
 
   return (
     <div>
@@ -104,7 +106,7 @@ const App = () => {
 
       <hr />
       { stories.isError && <p>Error in loading data!</p> }
-      { stories.isLoading ? <p>Loading...</p> : <List list={ searchedStories } onRemoveItem={ onDeleteStory }/> }
+      { stories.isLoading ? <p>Loading...</p> : <List list={ stories.data } onRemoveItem={ onDeleteStory }/> }
     </div>
   );
 }
