@@ -95,11 +95,12 @@ const App = () => {
     });
   }
 
-  const onSearchChange = (event) => {
+  const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   }
 
-  const handleSearchSubmit = () => {
+  const handleSearchSubmit = (event) => {
+    event.preventDefault();
     setUrl(`${API_ENDPOINT}${searchTerm}`);
   }
 
@@ -107,17 +108,7 @@ const App = () => {
     <div>
       <h1>Hello React</h1>
 
-      <InputWithLabel id='search' value={ searchTerm } isFocused onValueChange={ onSearchChange }>
-        <SimpleText text='Search: ' />
-      </InputWithLabel>
-
-      <button
-        type="button"
-        disabled={!searchTerm}
-        onClick={handleSearchSubmit}
-      >
-        Submit
-      </button>
+      <SearchForm searchTerm={ searchTerm } onSearchChange={ handleSearchChange } onSearchSubmit={ handleSearchSubmit } />
 
       <hr />
       { stories.isError && <p>Error in loading data!</p> }
@@ -154,6 +145,18 @@ const InputWithLabel = ({ id, type = 'text', value, isFocused, onValueChange, ch
     </>
   );
 }
+
+const SearchForm = ({ searchTerm, onSearchChange, onSearchSubmit }) => (
+  <form onSubmit={ onSearchSubmit }>
+    <InputWithLabel id='search' value={ searchTerm } isFocused onValueChange={ onSearchChange }>
+      <SimpleText text='Search: ' />
+    </InputWithLabel>
+
+    <button type="submit" disabled={ !searchTerm }>
+      Submit
+    </button>
+  </form>
+)
 
 const List = ({ list, onRemoveItem }) => (
   list.map(item => (
