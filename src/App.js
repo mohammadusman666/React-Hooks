@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useReducer, useCallback } from 'react';
+import axios from 'axios';
 
 const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
 
@@ -69,12 +70,11 @@ const App = () => {
     () => {
       dispatchStories({ type: 'STORIES_FETCH_INIT' });
 
-      fetch(url) // fetch popular tech stories for a certain query
-        .then(response => response.json()) // For the fetch API, the response needs to be translated into JSON
+      axios.get(url) // fetch popular tech stories for a certain query using axios
         .then((result) => {
           dispatchStories({
             type: 'STORIES_FETCH_SUCCESS',
-            payload: result.hits
+            payload: result.data.hits
           });
         })
         .catch(() => 
