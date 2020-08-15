@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useReducer } from 'react';
+import React, { useState, useEffect, useRef, useReducer, useCallback } from 'react';
 
 const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
 
@@ -46,7 +46,7 @@ const storiesReducer = (state, action) => {
     case 'DELETE_STORY':
       return {
         ...state,
-        data: state.filter(
+        data: state.data.filter(
           story => action.payload.objectID !== story.objectID
         )
       }
@@ -63,23 +63,30 @@ const App = () => {
 
   const [searchTerm, setSearchTerm] = useSemiPersistentState('searchTerm', 'React');
 
+  const handleFetchStories = useCallback(
+    () => {
+      if (!searchTerm) return;
+
+      dispatchStories({ type: 'STORIES_FETCH_INIT' });
+
+      fetch(`${API_ENDPOINT}${searchTerm}`) // fetch popular tech stories for a certain query
+        .then(response => response.json()) // For the fetch API, the response needs to be translated into JSON
+        .then((result) => {
+          dispatchStories({
+            type: 'STORIES_FETCH_SUCCESS',
+            payload: result.hits
+          });
+        })
+        .catch(() => 
+          dispatchStories({ type: 'STORIES_FETCH_FAILURE' })
+        );
+    },
+    [searchTerm],
+  )
+  
   useEffect(() => {
-    if (!searchTerm) return;
-
-    dispatchStories({ type: 'STORIES_FETCH_INIT' });
-
-    fetch(`${API_ENDPOINT}${searchTerm}`) // fetch popular tech stories for a certain query
-      .then(response => response.json()) // For the fetch API, the response needs to be translated into JSON
-      .then((result) => {
-        dispatchStories({
-          type: 'STORIES_FETCH_SUCCESS',
-          payload: result.hits
-        });
-      })
-      .catch(() => 
-        dispatchStories({ type: 'STORIES_FETCH_FAILURE' })
-      );
-  }, [searchTerm]);
+    handleFetchStories();
+  }, [handleFetchStories]);
   
   const onDeleteStory = (item) => {
     dispatchStories({
