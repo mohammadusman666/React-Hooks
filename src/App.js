@@ -39,11 +39,11 @@ const storiesReducer = (state, action) => {
         isError: false,
       };
     case 'STORIES_FETCH_FAILURE':
-        return {
-          ...state,
-          isLoading: false,
-          isError: true
-        };
+      return {
+        ...state,
+        isLoading: false,
+        isError: true
+      };
     case 'DELETE_STORY':
       return {
         ...state,
@@ -81,7 +81,7 @@ const App = () => {
           dispatchStories({ type: 'STORIES_FETCH_FAILURE' })
         );
     },
-    [url],
+    [url]
   )
   
   useEffect(() => {
